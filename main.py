@@ -67,9 +67,16 @@ def edit():
 
     movie_id = request.args.get('movie_id')
     movie = my_movies.query.get(movie_id)
+    if request.method == 'GET':
+        return render_template('edit.html', form=form, movie=movie)
+    elif request.method == 'POST':
+        new_rating = request.form['rating']
+        new_review = request.form['review']
 
-    return render_template('edit.html', form=form, movie=movie)
-
+        movie.rating = new_rating
+        movie.review = new_review
+        db.session.commit()
+        return redirect('/')
 
 
 if __name__ == '__main__':
