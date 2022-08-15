@@ -16,12 +16,18 @@ Bootstrap(app)
 db = SQLAlchemy(app)
 
 
+class RateMovieForm(FlaskForm):
+    rating = StringField(label='Your Rating our of 10 e.g. 7.5')
+    review = StringField(label='Your Review')
+    submit = SubmitField(label='Submit')
+
+
 # TODO--1b. Create table with pertinent data fields
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, unique=True, nullable=False)
     year = db.Column(db.Integer, unique=False, nullable=False)
-    description = db.Column(db.String(120), unique=False, nullable=False)
+    description = db.Column(db.String(100), unique=False, nullable=False)
     rating = db.Column(db.Integer, unique=False, nullable=False)
     ranking = db.Column(db.Integer, unique=False, nullable=False)
     review = db.Column(db.String, unique=False, nullable=False)
@@ -37,8 +43,7 @@ if not my_movies.query.get(1):
     my_movies.description = "Tony Manero (John Travolta) doesn't have much going for him during the weekdays. " \
                             "He still lives at home and works as a paint store clerk in his Brooklyn, N.Y., neighborhood. " \
                             "But he lives for the weekends, when he and his friends go to the local disco and dance the night away. " \
-                            "When a big dance competition is announced, he wrangles the beautiful and talented Stephanie (Karen Lynn Gorney) to be his partner. " \
-                            "As the two train for the big night, they start to fall for each other as well."
+
     my_movies.rating = 9.1
     my_movies.ranking = 1
     my_movies.review = "During my the 15 years I taught Latin dance, " \
@@ -48,11 +53,23 @@ if not my_movies.query.get(1):
     db.session.add(my_movies)
     db.session.commit()
 
+
 # TODO 3a. Display image on front of card
 @app.route("/")
 def home():
     all_movies = my_movies.query.all()
     return render_template("index.html", movies=all_movies)
+
+
+@app.route('/edit.html', methods=['POST', 'GET'])
+def edit():
+    form = RateMovieForm()
+
+    movie_id = request.args.get('movie_id')
+    movie = my_movies.query.get(movie_id)
+
+    return render_template('edit.html', form=form, movie=movie)
+
 
 
 if __name__ == '__main__':
