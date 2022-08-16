@@ -37,6 +37,7 @@ class Movie(db.Model):
 my_movies = Movie()
 db.create_all()
 
+
 if not my_movies.query.get(1):
     my_movies.title = 'Saturday Night Fever'
     my_movies.year = 1977
@@ -64,11 +65,20 @@ def home():
 @app.route('/edit.html', methods=['POST', 'GET'])
 def edit():
     form = RateMovieForm()
-
     movie_id = request.args.get('movie_id')
     movie = my_movies.query.get(movie_id)
+
     if request.method == 'GET':
+        if request.args.get('movie_title'):
+            movie_title = request.args.get('movie_title')
+
+            deleted_movie = my_movies.query.filter_by(title=movie_title).first()
+            db.session.delete(deleted_movie)
+            db.session.commit()
+            return redirect('/')
         return render_template('edit.html', form=form, movie=movie)
+
+    # This isn't activated until user clicks submit
     elif request.method == 'POST':
         new_rating = request.form['rating']
         new_review = request.form['review']

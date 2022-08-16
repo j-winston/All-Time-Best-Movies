@@ -34,7 +34,8 @@
         <p class="overview"> {{movie.description}} </p>
 <!--        TODO--5A. Update link takes you to edit page-->
         <a href=" {{ url_for('edit', movie_id=movie.id) }}" class="button">Update</a>
-        <a href="#" class="button delete-button">Delete</a>
+<!--          TODO 6.--Press delete to delete records-->
+        <a href=" {{ url_for('edit', movie_title=movie.title) }} " class="button delete-button">Delete</a>
 
       </div>
     </div>
