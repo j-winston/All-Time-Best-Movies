@@ -25,12 +25,12 @@ class RateMovieForm(FlaskForm):
 
 class AddMovieForm(FlaskForm):
     title = StringField()
-    year = StringField()
-    description = StringField()
-    rating = StringField()
-    ranking = StringField()
-    review = StringField()
-    img_url = StringField()
+    # year = StringField()
+    # description = StringField()
+    # rating = StringField()
+    # ranking = StringField()
+    # review = StringField()
+    # img_url = StringField()
     submit = SubmitField(label='Add Movie')
 
 
@@ -108,12 +108,12 @@ def add():
 
     if request.method == 'POST':
         my_movies.title = request.form['title']
-        my_movies.year = request.form['year']
-        my_movies.description = request.form['description']
-        my_movies.rating = request.form['description']
-        my_movies.ranking = request.form['ranking']
-        my_movies.review = request.form['review']
-        my_movies.img_url = request.form['img_url']
+        # my_movies.year = request.form['year']
+        # my_movies.description = request.form['description']
+        # my_movies.rating = request.form['description']
+        # my_movies.ranking = request.form['ranking']
+        # my_movies.review = request.form['review']
+        # my_movies.img_url = request.form['img_url']
         # Check if movie already exists!
         if my_movies.query.filter_by(title=request.form['title']).first():
             print(f'{my_movies.title} not added:it already exists!')
