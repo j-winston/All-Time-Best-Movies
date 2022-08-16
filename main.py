@@ -9,6 +9,7 @@ import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+
 # TODO--1a. Create a db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movie-list.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -20,6 +21,17 @@ class RateMovieForm(FlaskForm):
     rating = StringField(label='Your Rating our of 10 e.g. 7.5')
     review = StringField(label='Your Review')
     submit = SubmitField(label='Submit')
+
+
+class AddMovieForm(FlaskForm):
+    title = StringField()
+    year = StringField()
+    description = StringField()
+    rating = StringField()
+    ranking = StringField()
+    review = StringField()
+    img_url = StringField()
+    submit = SubmitField(label='Add Movie')
 
 
 # TODO--1b. Create table with pertinent data fields
@@ -87,6 +99,30 @@ def edit():
         movie.review = new_review
         db.session.commit()
         return redirect('/')
+
+
+@app.route('/add.html', methods=['POST', 'GET'])
+def add():
+    # TODO--7. Implement add functionality
+    add_movie_form = AddMovieForm()
+
+    if request.method == 'POST':
+        my_movies.title = request.form['title']
+        my_movies.year = request.form['year']
+        my_movies.description = request.form['description']
+        my_movies.rating = request.form['description']
+        my_movies.ranking = request.form['ranking']
+        my_movies.review = request.form['review']
+        my_movies.img_url = request.form['img_url']
+        # Check if movie already exists!
+        if my_movies.query.filter_by(title=request.form['title']).first():
+            print(f'{my_movies.title} not added:it already exists!')
+            return redirect('/')
+        else:
+            db.session.add(my_movies)
+            db.session.commit()
+            return redirect('/')
+    return render_template('add.html', form=add_movie_form)
 
 
 if __name__ == '__main__':

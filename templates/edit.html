@@ -1,5 +1,5 @@
 {% extends 'bootstrap/base.html' %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
 {% block styles %}
   {{ super() }}
@@ -16,7 +16,6 @@
   {{ csrf_token }}
   <h1 class="heading">{{movie.title}}</h1>
     <p class="description">Edit Movie Rating</p>
-    <form action=""
    {{ wtf.quick_form(form) }}
   </div>
 {% endblock %}
