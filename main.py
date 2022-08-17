@@ -146,15 +146,13 @@ def add():
         dt = datetime.strptime(movie_year, '%Y-%m-%d')
         year = dt.year
 
-        # Add movie to db
+        # Create new record and add to db
         new_movie = Movie()
         new_movie.title = title
         new_movie.year = year
         new_movie.img_url = 'https://image.tmdb.org/t/p/original/' + img_url
         new_movie.description = description
-        new_movie.rating = 9
-        new_movie.ranking = 10
-        new_movie.review = 10
+
         db.session.add(new_movie)
         db.session.commit()
         return redirect('/')
