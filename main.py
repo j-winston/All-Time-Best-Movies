@@ -33,7 +33,7 @@ class AddMovieForm(FlaskForm):
 # TODO--1b. Create table with pertinent data fields
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, unique=True, nullable=True)
+    title = db.Column(db.String, unique=False, nullable=True)
     year = db.Column(db.Integer, unique=False, nullable=True)
     description = db.Column(db.String(100), unique=False, nullable=True)
     rating = db.Column(db.Integer, unique=False, nullable=True)
