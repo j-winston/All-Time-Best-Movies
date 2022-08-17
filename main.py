@@ -6,6 +6,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
 from api_config import API_TOKEN
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -26,25 +27,19 @@ class RateMovieForm(FlaskForm):
 
 class AddMovieForm(FlaskForm):
     title = StringField()
-    # year = StringField()
-    # description = StringField()
-    # rating = StringField()
-    # ranking = StringField()
-    # review = StringField()
-    # img_url = StringField()
     submit = SubmitField(label='Add Movie')
 
 
 # TODO--1b. Create table with pertinent data fields
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, unique=True, nullable=False)
-    year = db.Column(db.Integer, unique=False, nullable=False)
-    description = db.Column(db.String(100), unique=False, nullable=False)
-    rating = db.Column(db.Integer, unique=False, nullable=False)
-    ranking = db.Column(db.Integer, unique=False, nullable=False)
-    review = db.Column(db.String, unique=False, nullable=False)
-    img_url = db.Column(db.String, unique=False, nullable=False)
+    title = db.Column(db.String, unique=True, nullable=True)
+    year = db.Column(db.Integer, unique=False, nullable=True)
+    description = db.Column(db.String(100), unique=False, nullable=True)
+    rating = db.Column(db.Integer, unique=False, nullable=True)
+    ranking = db.Column(db.Integer, unique=False, nullable=True)
+    review = db.Column(db.String, unique=False, nullable=True)
+    img_url = db.Column(db.String, unique=False, nullable=True)
 
 
 my_movies = Movie()
@@ -107,15 +102,10 @@ def add():
     # TODO--7. Implement add functionality
     add_movie_form = AddMovieForm()
 
+    # If user clicks 'add movie' button
     if request.method == 'POST':
         my_movies.title = request.form['title']
-        # my_movies.year = request.form['year']
-        # my_movies.description = request.form['description']
-        # my_movies.rating = request.form['description']
-        # my_movies.ranking = request.form['ranking']
-        # my_movies.review = request.form['review']
-        # my_movies.img_url = request.form['img_url']
-        # Check if movie already exists!
+        # Check if movie exists, if so, redirect home
         if my_movies.query.filter_by(title=request.form['title']).first():
             print(f'{my_movies.title} not added:it already exists!')
             return redirect('/')
@@ -130,10 +120,44 @@ def add():
             params = {
                 'query': f'{my_movies.title}'
             }
-
+            # Show tmdb results
             r = requests.get(url=endpoint, headers=headers, params=params)
             search_results = r.json()['results']
             return render_template('select.html', results=search_results)
+
+    # If movie id is passed, search for it and add to db
+    if request.args.get('movie_id'):
+        movie_id = request.args.get('movie_id')
+        search_endpoint = f'https://api.themoviedb.org/3/movie/{movie_id}'
+        headers = {
+            'Authorization': f'Bearer {API_TOKEN}',
+            'Content-Type': 'application/json; charset=utf-8'
+        }
+        r = requests.get(url=search_endpoint, headers=headers)
+        movie = r.json()
+
+        # Extract all movie data
+        title = movie['original_title']
+        movie_year = movie['release_date']
+        description = movie['overview']
+        img_url = movie['poster_path']
+
+        # Use just the year for the movie
+        dt = datetime.strptime(movie_year, '%Y-%m-%d')
+        year = dt.year
+
+        # Add movie to db
+        new_movie = Movie()
+        new_movie.title = title
+        new_movie.year = year
+        new_movie.img_url = 'https://image.tmdb.org/t/p/original/' + img_url
+        new_movie.description = description
+        new_movie.rating = 9
+        new_movie.ranking = 10
+        new_movie.review = 10
+        db.session.add(new_movie)
+        db.session.commit()
+        return redirect('/')
 
     return render_template('add.html', form=add_movie_form)
 
