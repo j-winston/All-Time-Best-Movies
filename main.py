@@ -5,6 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
+from api_config import API_TOKEN
 
 
 app = Flask(__name__)
@@ -119,9 +120,21 @@ def add():
             print(f'{my_movies.title} not added:it already exists!')
             return redirect('/')
         else:
-            db.session.add(my_movies)
-            db.session.commit()
-            return redirect('/')
+            # Search the tmdb for title
+            endpoint = f'https://api.themoviedb.org/3/search/movie/'
+            headers = {
+                'Authorization': f'Bearer {API_TOKEN}',
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+
+            params = {
+                'query': f'{my_movies.title}'
+            }
+
+            r = requests.get(url=endpoint, headers=headers, params=params)
+            search_results = r.json()['results']
+            return render_template('select.html', results=search_results)
+
     return render_template('add.html', form=add_movie_form)
 
 
