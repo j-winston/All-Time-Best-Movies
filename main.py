@@ -66,7 +66,14 @@ if not my_movies.query.get(1):
 # TODO 3a. Display image on front of card
 @app.route("/")
 def home():
-    all_movies = my_movies.query.all()
+    all_movies = my_movies.query.order_by('rating')
+    num_movies = my_movies.query.count()
+    i = 0
+    # Assign a ranking number to each movie
+    for movie in all_movies:
+        movie.ranking = num_movies - i
+        i += 1
+
     return render_template("index.html", movies=all_movies)
 
 
@@ -156,7 +163,6 @@ def add():
         db.session.add(new_movie)
         db.session.commit()
         return redirect('/')
-
     return render_template('add.html', form=add_movie_form)
 
 
